@@ -1,0 +1,5 @@
+*.bin
+test.c
+.vscode
+*.out
+*.mtx
