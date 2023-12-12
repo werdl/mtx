@@ -67,13 +67,13 @@ int* u8_to_int(const uint8_t *input) {
 
 int char_mt_int(char c) {
     if (strchr("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789. ", c)) {
-        return c - 'a' + 0; // Adjust the offset based on the range of characters
+        return c - 'a';
     } else {
         return -1; // Invalid character
     }
 }
 
-char mt_int_to_char(int mt_int) {
+char mt_int_char(int mt_int) {
     if (mt_int >= 0 && mt_int <= 61) {
         return (char)(mt_int + 'a');
     } else if (mt_int == 62) {
@@ -84,26 +84,78 @@ char mt_int_to_char(int mt_int) {
     }
 }
 
+int len(int * arr) {
+    int i = 0;
+    while (arr[i]) i++;
+    return i;
+}
+
+int * string_to_mt(const char * input) {
+    int * output = malloc((strlen(input) + 2) * sizeof(int));
+    int i = 0;
+    for (i = 0; i < strlen(input); i++) {
+        output[i] = char_mt_int(input[i]);
+    }
+    output[i++] = 0;
+    return output;
+}
+
+char * mt_to_string(int * input) {
+    char * output = malloc((len(input) + 1) * sizeof(char));
+    for (int i = 0; i < len(input); i++) {
+        output[i] = mt_int_char(input[i]);
+    }
+    return output;
+}
+
+char * read(const char * filename) {
+    FILE * file = fopen(filename, "rb");
+    if (file != NULL) {
+        fseek(file, 0, SEEK_END);
+        long file_size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        uint8_t *readArray = (uint8_t *)malloc(file_size * sizeof(uint8_t));
+        fread(readArray, sizeof(uint8_t), file_size, file);
+
+        int *decodedOutput = u8_to_int(readArray);
+
+        printf("Decoded int array: ");
+        for (int i = 0; decodedOutput[i] != 0; ++i) {
+            printf("%d ", decodedOutput[i]);
+        }
+        printf("\n");
+
+        fclose(file);
+
+        return mt_to_string(decodedOutput);
+    } else {
+        printf("Error opening file for reading\n");
+        return NULL;
+    }
+}
+
+int write(const char * filename, const char * data) {
+    int * input = string_to_mt(data);
+    uint8_t *convertedArray = int_to_u8(input);
+
+    // Writing to a binary file
+    FILE *file = fopen(filename, "wb");
+    if (file != NULL) {
+        fwrite(convertedArray, sizeof(uint8_t), strlen((char*)convertedArray), file);
+        fclose(file);
+    } else {
+        printf("Error opening file for writing\n");
+        return -1;
+    }
+
+    return 0;
+}
 
 int main() {
-    int input[] = {15, 25, 31, 42, 0}; // Added a zero at the end as a terminator
-    uint8_t *convertedArray = int_to_u8(input);
-    int *output = u8_to_int(convertedArray);
-
-    printf("Original int array: ");
-    for (int i = 0; input[i] != 0; ++i) {
-        printf("%d ", input[i]);
-    }
-    printf("\n");
-
-    printf("Converted back int array: ");
-    for (int i = 0; output[i] != 0; ++i) {
-        printf("%d ", output[i]);
-    }
-    printf("\n");
-
-    free(convertedArray);
-    free(output);
+    (void)write("t.bin", "hello");
+    printf("%s", read("t.bin"));
+    
 
     return 0;
 }

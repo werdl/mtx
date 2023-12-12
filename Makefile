@@ -1,2 +1,2 @@
 build:
-	gcc -Werror -pedantic main.c -o mintext
+	gcc -Werror -g -pedantic main.c -o mintext
