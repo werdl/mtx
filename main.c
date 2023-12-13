@@ -98,21 +98,28 @@ char mt_int_char(int num) {
 }
 
 
-int len(int * arr) {
+int len(int *arr) {
+    if (!arr) {
+        return 0;
+    }
     int i = 0;
-    while (arr[i]) i++;
+    while (arr[i] != 0) i++;
     return i;
 }
 
-int lens(char * arr) {
+int lens(char *arr) {
+    if (!arr) {
+        return 0;
+    }
     int i = 0;
-    while (arr[i] != NULL) i++;
+    while (arr[i] != '\0') i++;
     return i;
 }
 
 int lent(uint8_t * arr) {
+    if (!arr) return 0;
     int i = 0;
-    while (arr[i]) i++;
+    while (arr[i] != 0) i++;
     return i;
 }
 
@@ -127,8 +134,9 @@ int * string_to_mt(const char * input) {
 }
 
 char * mt_to_string(int * input) {
-    char * output = malloc((len(input) + 1) * sizeof(char));
-    for (int i = 0; i < len(input); i++) {
+    int length = len(input);
+    char * output = malloc((length + 1) * sizeof(char));
+    for (int i = 0; i < length; i++) {
         if (input[i]<64 && input[i]!=0) {
             output[i] = mt_int_char(input[i]);
         } 
@@ -151,6 +159,7 @@ char * read(const char * filename) {
         readArray[file_size] = '\0';
 
         int *decodedOutput = u8_to_int(readArray);
+        free(decodedOutput);
 
         fclose(file);
 
@@ -229,7 +238,7 @@ int main(int argc, char ** argv) {
             if (!argv[2]) {
                 error("Wrong arguments");
             }
-            char * x = malloc(MAXCHARS);
+            char * x = malloc(MAXCHARS * sizeof(char));
             strcmp(x, read(
                 argv[2] // infile
             ));
@@ -237,6 +246,7 @@ int main(int argc, char ** argv) {
             free(x);
             exit(EXIT_FAILURE);
         }
+        free(command);
     }
     printf("%s", "mintext -- a tiny text format\n\
 write <in> <out>\n\
