@@ -104,12 +104,17 @@ int len(int * arr) {
     return i;
 }
 
+int lens(char * arr) {
+    int i = 0;
+    while (arr[i] != NULL) i++;
+    return i;
+}
+
 int lent(uint8_t * arr) {
     int i = 0;
     while (arr[i]) i++;
     return i;
 }
-
 
 int * string_to_mt(const char * input) {
     int * output = malloc((strlen(input) + 2) * sizeof(int));
@@ -128,7 +133,7 @@ char * mt_to_string(int * input) {
             output[i] = mt_int_char(input[i]);
         } 
     }
-    output[strlen(output)]='\0';
+    output[lens(output)]='\0';
     return output;
 }
 
@@ -224,9 +229,12 @@ int main(int argc, char ** argv) {
             if (!argv[2]) {
                 error("Wrong arguments");
             }
-            printf("%s", read(
+            char * x = malloc(MAXCHARS);
+            strcmp(x, read(
                 argv[2] // infile
             ));
+            printf("%s", x);
+            free(x);
             exit(EXIT_FAILURE);
         }
     }
