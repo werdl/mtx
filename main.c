@@ -33,6 +33,8 @@ uint8_t* int_to_u8(const int *input) {
         }
     }
 
+    free(output);
+
     return final;
 }
 
@@ -78,26 +80,6 @@ int get_pos(const char *str, char target) {
 }
 
 char *chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
-
-int char_mt_int(char c) {
-    if (strchr(chars, c)) {
-        return get_pos(chars, c) + 1;
-    } else {
-        return -1; // Invalid character
-    }
-}
-
-char mt_int_char(int num) {
-    int length = strlen(chars);
-
-    if (num >= 1 && num <= length) {
-        return chars[num - 1];
-    } else {
-        return '\0'; // Invalid number
-    }
-}
-
-
 int len(int *arr) {
     if (!arr) {
         return 0;
@@ -115,6 +97,25 @@ int lens(char *arr) {
     while (arr[i] != '\0') i++;
     return i;
 }
+int char_mt_int(char c) {
+    if (strchr(chars, c)) {
+        return get_pos(chars, c) + 1;
+    } else {
+        return -1; // Invalid character
+    }
+}
+
+char mt_int_char(int num) {
+    int length = lens(chars);
+    if (num >= 1 && num <= length) {
+        return chars[num - 1];
+    } else {
+        return '\0'; // Invalid number
+    }
+}
+
+
+
 
 int lent(uint8_t * arr) {
     if (!arr) return 0;
@@ -133,15 +134,19 @@ int * string_to_mt(const char * input) {
     return output;
 }
 
-char * mt_to_string(int * input) {
+char * mt_to_string(int *input) {
     int length = len(input);
-    char * output = malloc((length + 1) * sizeof(char));
+    char *output = malloc((length + 1) * sizeof(char));  // Add 1 for the null terminator
+
     for (int i = 0; i < length; i++) {
-        if (input[i]<64 && input[i]!=0) {
+        if (input[i] < 64 && input[i] != 0) {
             output[i] = mt_int_char(input[i]);
-        } 
+        } else {
+            exit(EXIT_FAILURE);
+        }
     }
-    output[lens(output)]='\0';
+
+    output[length] = '\0';  // Null-terminate the output string
     return output;
 }
 
@@ -159,11 +164,12 @@ char * read(const char * filename) {
         readArray[file_size] = '\0';
 
         int *decodedOutput = u8_to_int(readArray);
-        free(decodedOutput);
-
         fclose(file);
+        free(readArray);
 
-        return mt_to_string(decodedOutput);
+        char *result = mt_to_string(decodedOutput);
+        free(decodedOutput);  // Free dynamically allocated memory
+        return result;
     } else {
         printf("Error opening file for reading\n");
         return NULL;
@@ -216,42 +222,36 @@ uint8_t * str_mt(const char * data) {
 char * mt_str(uint8_t * data) {
     return mt_to_string(u8_to_int(data));
 }
-#define error(s) do {\
-    fprintf(stderr, "Error - %s", s);\
-    exit(EXIT_FAILURE);\
-} while (0)
+#define fail(callee) fprintf(stderr, "Usage: %s <input_file> %s%s\n", callee, !strcmp(callee, "write")?"<out_file> ":"", argv[0]);\
 
-int main(int argc, char ** argv) {
-    if (argv[1]) {
-        char * command = argv[1];
-
-        if (!strcmp(command, "write")) {
-            if (!argv[2] || !argv[3]) {
-                error("Wrong arguments");
-            }
-            exit(
-                write(
-                    argv[3], // outfile
-                    contents(argv[2]) // contents of infile
-                    ));
-        } else if (!strcmp(command, "read")) {
-            if (!argv[2]) {
-                error("Wrong arguments");
-            }
-            char * x = malloc(MAXCHARS * sizeof(char));
-            strcmp(x, read(
-                argv[2] // infile
-            ));
-            printf("%s", x);
-            free(x);
-            exit(EXIT_FAILURE);
-        }
-        free(command);
+int main(int argc, char **argv) {
+    if (argc > 4 || argc < 2) {
+        fail("read");
+        fail("write");
+        return EXIT_FAILURE;
     }
-    printf("%s", "mintext -- a tiny text format\n\
-write <in> <out>\n\
-    reads from infile (text), outputs to outfile (mtx)\n\
-read <in>\n\
-    reads from infile (mtx)\n"); // default help page
-    return 0;
+
+    char *command = argv[1];
+    char *inputFile = argv[2];
+
+    if (!strcmp(command, "write")) {
+        if (!argv[3]) {
+            fail("write");
+            return EXIT_FAILURE;
+        }
+        char *outputFile = argv[3];
+        char *content = contents(inputFile);
+        write(outputFile, content);
+        free(content);
+    } else if (!strcmp(command, "read")) {
+        char *content = read(inputFile);
+        printf("%s", content);
+        free(content);
+    } else {
+        fprintf(stderr, "Unknown command: %s\n", command);
+        fail("read");
+        fail("write");
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
