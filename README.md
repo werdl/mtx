@@ -21,5 +21,7 @@ char * mt_str(uint8_t * data); // takes byte array, converts to string
 
 ### Storing something longer
 `Fourty Two is The Answer To Life The Universe And Everything`
-- Best done with the C API
-- Still works with files, just the odd bizarre char (don't know why, C API works)
+```
+-rw-rw-rw- 1 codespace codespace    45 Dec 13 16:16 42.mtx
+-rw-rw-rw- 1 codespace codespace    60 Dec 13 16:16 42.txt
+```
