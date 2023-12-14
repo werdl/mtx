@@ -79,7 +79,7 @@ int get_pos(const char *str, char target) {
     return index;
 }
 
-char *chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
+char *chars = "abcdefghijklmnopqrstuvwxyz0123456789 \n(){}[]#~.:;*+-=\"'<>?!$%%";
 int len(int *arr) {
     if (!arr) {
         return 0;
@@ -101,7 +101,8 @@ int char_mt_int(char c) {
     if (strchr(chars, c)) {
         return get_pos(chars, c) + 1;
     } else {
-        return -1; // Invalid character
+        fprintf(stderr, "%s - '%c' \n", "Invalid Character", c);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -113,9 +114,6 @@ char mt_int_char(int num) {
         return '\0'; // Invalid number
     }
 }
-
-
-
 
 int lent(uint8_t * arr) {
     if (!arr) return 0;
