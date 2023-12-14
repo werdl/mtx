@@ -2,6 +2,7 @@
 
 - A file format that crams characters into less than 1 byte
 - Not meant to be perfect!
+- Technically an ASCII subset?
 
 ## Supported chars (63)
 `abcdefghijklmnopqrstuvwxyz0123456789 \n(){}[]@~#:;*+-=\"'<>?!$%` (including space)
