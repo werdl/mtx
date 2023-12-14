@@ -20,7 +20,7 @@ char * mt_str(uint8_t * data); // takes byte array, converts to string
 ```
 
 ### Storing something longer
-`Fourty Two is The Answer To Life The Universe And Everything`
+`fourty two is the answer to life the universe and everything`
 ```
 -rw-rw-rw- 1 werdl werdl    45 Dec 13 16:16 42.mtx
 -rw-rw-rw- 1 werdl werdl    60 Dec 13 16:16 42.txt
